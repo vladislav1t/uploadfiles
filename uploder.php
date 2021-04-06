@@ -1,7 +1,4 @@
 <?php
-/*ini_set('display', 1);
-error_reporting(E_ALL);
-var_dump($_FILES);*/
 $max_size = ini_get('upload_max_filesize');
 $fileErrors = array(
     0 => 'Файл был успешно загружен.<br><a href="/">назад</a>',
@@ -13,12 +10,11 @@ $fileErrors = array(
     7 => 'Не удалось записать файл на диск.<br><a href="/">назад</a>',
     8 => 'Остановленна загрузка файла.<br><a href="/">назад</a>',
 );
-$ext = ['jpeg','jpg','png'];
-$info = new SplFileInfo($_FILES['file']['name']);
-
-if ($_FILES) {
+if ($_FILES['files']) {
     $newfile = 'files/' . $_FILES['file']['name'];
-    if(!in_array($info->getExtension(),$ext)){
+    $ext = ['jpeg', 'jpg', 'png'];
+    $info = new SplFileInfo($_FILES['file']['name']);
+    if (!in_array($info->getExtension(), $ext)) {
         exit('Недопустимое расшерение файла');
     }
     if (file_exists($newfile)) {
@@ -26,9 +22,11 @@ if ($_FILES) {
         exit();
     }
     $uploadError = $_FILES['file']['error'];
-    if($uploadError > 0){
-    echo $fileErrors[$uploadError];
-    exit();
+    if ($uploadError > 0) {
+        echo $fileErrors[$uploadError];
+        exit();
+    } elseif ($uploadError > 8){
+        echo 'неизвестная ошибка<br> <a href='/'>назад</a>';
     }
 
     if (move_uploaded_file($_FILES['file']['tmp_name'], $newfile)) {
@@ -38,5 +36,5 @@ if ($_FILES) {
         echo "Произошла ошибка при загрузки файла ";
     }
 } else {
-    echo 'Размер принятого файла превысил максимально допустимый размер ' .$max_size. '.<br><a href="/">назад</a>';
+    echo 'Размер принятого файла превысил максимально допустимый размер ' . $max_size . '.<br><a href="/">назад</a>';
 }
